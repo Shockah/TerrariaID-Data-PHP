@@ -10,6 +10,7 @@ $images = false;
 $limit = 0;
 $newlines = false;
 $sort = array();
+$filters = array();
 
 $sortableFields = array(
 	'id' => 'id',
@@ -21,6 +22,30 @@ $sortableFields = array(
 	'hammer' => 'hammerPower',
 	'fishing' => 'fishingPower',
 	'bait' => 'baitPower'
+);
+$filterableFields = array(
+	'quest' => 'questItem',
+	'pickaxe' => 'pickaxePower',
+	'axe' => 'axePower',
+	'hammer' => 'hammerPower',
+	'fishing' => 'fishingPower',
+	'bait' => 'baitPower',
+	'weapon' => null,
+	'melee' => 'melee',
+	'ranged' => 'ranged',
+	'magic' => 'magic',
+	'summon' => 'summon',
+	'ammo' => 'ammo',
+	'accessory' => 'accessory',
+	'armor' => null,
+	'head' => 'armorHead',
+	'body' => 'armorBody',
+	'legs' => 'armorLegs',
+	'expert' => 'expert'
+);
+$filterExtras = array(
+	'armor' => function($item){ return $item->armorHead != 0 || $item->armorBody != 0 || $item->armorLegs != 0; },
+	'weapon' => function($item){ return $item->damage > 0 && ($item->useStyle > 1 || ($item->useStyle == 1 && !$item->consumable)); }
 );
 
 while (true) {
@@ -46,6 +71,14 @@ while (true) {
 		}
 		if (array_key_exists($sortBy, $sortableFields))
 			array_push($sort, array($sortBy, $sortOrder));
+		$input = trim(substr($input, strlen($matches[0])));
+	} else if (preg_match('/^\-filter ([\+\-])(\w+)(?:,([\+\-])(\w+))*/i', $input, $matches)) {
+		for ($i = 0; $i < count($matches) - 1; $i += 2) {
+			$filterBool = $matches[$i + 1] == '+';
+			$filterField = strtolower($matches[$i + 2]);
+			if (array_key_exists($filterField, $filterableFields))
+				array_push($filters, array($filterField, $filterBool));
+		}
 		$input = trim(substr($input, strlen($matches[0])));
 	} else
 		break;
@@ -83,10 +116,27 @@ foreach ($ids as $id) {
 		array_push($items, $item);
 }
 
+if (!empty($filters)) {
+	$items = array_filter($items, function($i) use ($filters, $filterableFields, $filterExtras){
+		foreach ($filters as $filter) {
+			$field = $filterableFields[$filter[0]];
+			if ($field != null)
+				if ($i->{$field} <= 0)
+					return false;
+			if (array_key_exists($filter[0], $filterExtras))
+				if (!$filterExtras[$filter[0]]($i))
+					return false;
+		}
+		return true;
+	});
+}
+
 if (!empty($sort)) {
 	$items = array_filter($items, function($i) use ($sort, $sortableFields){
 		foreach ($sort as $sortOne) {
-			return $i->{$sortableFields[$sortOne[0]]} != 0;
+			if ($sortOne[0] == 'id')
+				return $i->{$sortableFields[$sortOne[0]]} != 0;
+			return $i->{$sortableFields[$sortOne[0]]} > 0;
 		}
 	});
 	usort($items, function($i1, $i2) use ($sort, $sortableFields){
