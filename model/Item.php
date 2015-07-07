@@ -22,6 +22,7 @@ class Item extends ModelObject {
 		$obj->expert = value($json, 'expert', false);
 		$obj->maxStack = value($json, 'maxStack', 1);
 		$obj->scale = value($json, 'scale');
+		$obj->consumable = value($json, 'consumable');
 		$obj->useStyle = value($json, 'useStyle', 0);
 		$obj->useAnimation = value($json, 'useAnimation', 0);
 		$obj->useTime = value($json, 'useTime', 0);
@@ -125,7 +126,7 @@ class Item extends ModelObject {
 	public $id, $netID;
 	public $name, $displayName, $tooltip, $rare, $questItem, $expert, $maxStack;
 	public $size, $scale;
-	public $useStyle;
+	public $consumable, $useStyle;
 	public $useAnimation, $useTime, $mana, $range;
 	public $pickaxePower, $axePower, $hammerPower, $fishingPower, $baitPower;
 	public $damage, $knockback, $autoReuse, $useTurn;
@@ -184,7 +185,7 @@ class Item extends ModelObject {
 			if ($this->knockback > 0)
 				$txt .= ', '.strtolower($this->myKnockbackValueText()).' ('.(round($this->knockback * 10) / 10).') knockback';
 
-			if ($this->ammo == 0) {
+			if ($this->ammo == 0 && !$this->consumable) {
 				$useTimeMin = min($this->useTime, $this->useAnimation);
 				$useTimeMax = max($this->useTime, $this->useAnimation);
 				$txt .= ', '.strtolower($this->mySpeedValueText()).' ('.$useTimeMin.($useTimeMin != $useTimeMax ? '/'.$useTimeMax : '').') speed';
