@@ -1,6 +1,8 @@
 <?php
 
 class NPC extends ModelObject {
+	const IMAGE_URLS = true;
+
 	public static function fromJSON($json) {
 		$npc = new NPC();
 		NPC::deserialize($npc, $json);
@@ -58,7 +60,19 @@ class NPC extends ModelObject {
 		if ($this->value > 0)
 			$txt .= "\n".$this->myCoinValueText();
 
+		if (NPC::IMAGE_URLS) {
+			$imageURL = $this->imageURL();
+			if ($imageURL != null)
+				$txt .= "\n".$imageURL;
+		}
+
 		return $txt;
+	}
+
+	public function imageURL() {
+		if (file_exists(Core::$basePath.'/images/NPC_'.$this->id.'.png'))
+			return Core::$baseURL.'/NPC_'.$this->id.'.png';
+		return null;
 	}
 
 	public function myCoinValueText() {

@@ -6,6 +6,7 @@ $matches = null;
 $input = $_GET['nameLike'];
 
 $similarity = null;
+$images = false;
 $limit = 0;
 $newlines = false;
 $prop = null;
@@ -33,6 +34,10 @@ while (true) {
 		$input = trim(substr($input, strlen($matches[0])));
 	} else if (preg_match('/^\-prop (\w+)/i', $input, $matches)) {
 		$prop = $matches[1];
+		$input = trim(substr($input, strlen($matches[0])));
+	} else if (preg_match('/^\-images/i', $input, $matches)) {
+		$images = true;
+		$newlines = true;
 		$input = trim(substr($input, strlen($matches[0])));
 	} else if (preg_match('/^\-limit (\d+)/i', $input, $matches)) {
 		$limit = intval($matches[1]);
@@ -133,9 +138,19 @@ if ($rand)
 $text = '';
 foreach ($npcs as $npc) {
 	if ($prop == null) {
-		if ($text !== '')
-			$text .= $newlines ? "\n" : ' ';
-		$text .= $npc->labelIRC(true);
+		if ($images) {
+			$url = $npc->imageURL();
+			if ($url != null) {
+				if ($text !== '')
+					$text .= $newlines ? "\n" : ' ';
+				$text .= $npc->labelIRC(true);
+				$text .= ' '.$url;
+			}
+		} else {
+			if ($text !== '')
+				$text .= $newlines ? "\n" : ' ';
+			$text .= $npc->labelIRC(true);
+		}
 	} else {
 		$val = $npc->getProp($prop);
 		if ($val != null) {

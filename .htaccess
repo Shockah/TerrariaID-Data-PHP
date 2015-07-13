@@ -1,3 +1,4 @@
 RewriteEngine On
 
 RewriteRule ^Item_([0-9]+).png$ images/Item_$1.png [L]
+RewriteRule ^NPC_([0-9]+).png$ images/NPC_$1.png [L]

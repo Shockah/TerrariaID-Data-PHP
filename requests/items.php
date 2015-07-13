@@ -35,6 +35,7 @@ $filterableFields = array(
 	'weapon' => null,
 	'melee' => 'melee',
 	'ranged' => 'ranged',
+	'thrown' => 'thrown',
 	'magic' => 'magic',
 	'summon' => 'summon',
 	'ammo' => 'ammo',

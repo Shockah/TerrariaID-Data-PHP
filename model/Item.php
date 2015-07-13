@@ -40,6 +40,7 @@ class Item extends ModelObject {
 		$obj->critChance = value($json, 'crit', 0);
 		$obj->melee = value($json, 'melee', false);
 		$obj->ranged = value($json, 'ranged', false);
+		$obj->thrown = value($json, 'thrown', false);
 		$obj->magic = value($json, 'magic', false);
 		$obj->summon = value($json, 'summon', false);
 		$obj->ammo = value($json, 'ammo', 0);
@@ -130,7 +131,7 @@ class Item extends ModelObject {
 	public $useAnimation, $useTime, $mana, $range;
 	public $pickaxePower, $axePower, $hammerPower, $fishingPower, $baitPower;
 	public $damage, $knockback, $autoReuse, $useTurn;
-	public $melee, $ranged, $magic, $summon, $ammo;
+	public $melee, $ranged, $thrown, $magic, $summon, $ammo;
 	public $accessory, $armorHead, $armorBody, $armorLegs, $defense, $healLife;
 	public $value;
 	public $useSound, $createTile, $createWall;
@@ -162,6 +163,11 @@ class Item extends ModelObject {
 				if ($damageType != '')
 					$damageType .= '/';
 				$damageType .= 'ranged';
+			}
+			if ($this->thrown) {
+				if ($damageType != '')
+					$damageType .= '/';
+				$damageType .= 'thrown';
 			}
 			if ($this->magic) {
 				if ($damageType != '')
