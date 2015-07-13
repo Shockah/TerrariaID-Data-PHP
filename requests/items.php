@@ -9,6 +9,8 @@ $similarity = null;
 $images = false;
 $limit = 0;
 $newlines = false;
+$prop = null;
+$rand = false;
 $sort = array();
 $filters = array();
 
@@ -55,9 +57,15 @@ while (true) {
 	} else if (preg_match('/^\-limit (\d+)/i', $input, $matches)) {
 		$limit = intval($matches[1]);
 		$input = trim(substr($input, strlen($matches[0])));
+	} else if (preg_match('/^\-prop (\w+)/i', $input, $matches)) {
+		$prop = $matches[1];
+		$input = trim(substr($input, strlen($matches[0])));
 	} else if (preg_match('/^\-images/i', $input, $matches)) {
 		$images = true;
 		$newlines = true;
+		$input = trim(substr($input, strlen($matches[0])));
+	} else if (preg_match('/^\-rand/i', $input, $matches)) {
+		$rand = true;
 		$input = trim(substr($input, strlen($matches[0])));
 	} else if (preg_match('/^\-newlines/i', $input, $matches)) {
 		$newlines = true;
@@ -120,11 +128,12 @@ if (!empty($filters)) {
 	$items = array_filter($items, function($i) use ($filters, $filterableFields, $filterExtras){
 		foreach ($filters as $filter) {
 			$field = $filterableFields[$filter[0]];
+			$state = $filter[1];
 			if ($field != null)
-				if ($i->{$field} <= 0)
+				if (($i->{$field} <= 0) ^ !$state)
 					return false;
 			if (array_key_exists($filter[0], $filterExtras))
-				if (!$filterExtras[$filter[0]]($i))
+				if ((!$filterExtras[$filter[0]]($i)) ^ !$state)
 					return false;
 		}
 		return true;
@@ -147,27 +156,38 @@ if (!empty($sort)) {
 		return 0;
 	});
 }
+if ($rand)
+	shuffle($items);
 
 $text = '';
 foreach ($items as $item) {
-	if ($images) {
-		$url = $item->imageURL();
-		if ($url != null) {
+	if ($prop == null) {
+		if ($images) {
+			$url = $item->imageURL();
+			if ($url != null) {
+				if ($text !== '')
+					$text .= $newlines ? "\n" : ' ';
+				$text .= $item->labelIRC(true);
+				$text .= ' '.$url;
+			}
+		} else {
 			if ($text !== '')
 				$text .= $newlines ? "\n" : ' ';
 			$text .= $item->labelIRC(true);
-			$text .= ' '.$url;
 		}
 	} else {
-		if ($text !== '')
-			$text .= $newlines ? "\n" : ' ';
-		$text .= $item->labelIRC(true);
+		$val = $item->getProp($prop);
+		if ($val != null) {
+			if ($text !== '')
+				$text .= $newlines ? "\n" : ' ';
+			$text .= $val;
+		}
 	}
 
 	if (--$limit == 0)
 		break;
 }
-echo($text);
+echo(trim($text));
 
 if ($text === '')
 	echo('No items found.');

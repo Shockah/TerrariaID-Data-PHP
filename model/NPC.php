@@ -64,6 +64,13 @@ class NPC extends ModelObject {
 	public function myCoinValueText() {
 		return ModelObject::coinValueText($this->value);
 	}
+
+	public function getProp($prop) {
+		if ($prop == 'pretty_value')
+			return $this->myCoinValueText();
+
+		return parent::getProp($prop);
+	}
 }
 
 ?>

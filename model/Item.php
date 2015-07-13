@@ -365,6 +365,17 @@ class Item extends ModelObject {
 		}
 		return $ret;
 	}
+
+	public function getProp($prop) {
+		if ($prop == 'pretty_value')
+			return $this->myCoinValueText();
+		if ($prop == 'pretty_knockback')
+			return $this->myKnockbackValueText();
+		if ($prop == 'pretty_speed')
+			return $this->mySpeedValueText();
+
+		return parent::getProp($prop);
+	}
 }
 
 ?>

@@ -46,6 +46,12 @@ abstract class ModelObject {
 		}
 		return $txt.IRC::RESET;
 	}
+
+	public function getProp($prop) {
+		if (isset($this->{$prop}))
+			return $this->{$prop};
+		return null;
+	}
 }
 
 ?>
