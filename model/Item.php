@@ -373,6 +373,8 @@ class Item extends ModelObject {
 	}
 
 	public function getProp($prop) {
+		if ($prop == 'pretty_displayName')
+			return $this->labelIRC(false);
 		if ($prop == 'pretty_value')
 			return $this->myCoinValueText();
 		if ($prop == 'pretty_knockback')
