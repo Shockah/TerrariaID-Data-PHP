@@ -153,32 +153,13 @@ class Item extends ModelObject {
 
 		if ($this->damage > 0) {
 			$txt .= "\n".$this->damage.' ';
-			$damageType = '';
-			if ($this->melee) {
-				if ($damageType != '')
-					$damageType .= '/';
-				$damageType .= 'melee';
+			$damageTypes = [];
+			foreach (['melee', 'ranged', 'thrown', 'magic', 'summon'] as $type) {
+				if (property_exists($this, $type) && $this->{$type}) {
+					$damageTypes[] = $type;
+				}
 			}
-			if ($this->ranged) {
-				if ($damageType != '')
-					$damageType .= '/';
-				$damageType .= 'ranged';
-			}
-			if ($this->thrown) {
-				if ($damageType != '')
-					$damageType .= '/';
-				$damageType .= 'thrown';
-			}
-			if ($this->magic) {
-				if ($damageType != '')
-					$damageType .= '/';
-				$damageType .= 'magic';
-			}
-			if ($this->summon) {
-				if ($damageType != '')
-					$damageType .= '/';
-				$damageType .= 'summon';
-			}
+			$damageType = implode('/', $damageTypes);
 			if ($damageType != '')
 				$txt .= $damageType.' ';
 			$txt .= 'damage';
@@ -206,32 +187,13 @@ class Item extends ModelObject {
 				$txt .= ', '.$this->mana.' mana';
 		}
 
-		$toolPower = '';
-		if ($this->pickaxePower > 0) {
-			if ($toolPower != '')
-				$toolPower .= ', ';
-			$toolPower .= $this->pickaxePower.'% pickaxe power';
+		$toolPowers = [];
+		foreach (['pickaxe', 'axe', 'hammer', 'fishing', 'bait'] as $type) {
+			if (property_exists($this, $type.'Power') && $this->{$type.'Power'} > 0) {
+				$toolPowers[] = $this->{$type.'Power'}.'% '.$type.' power';
+			}
 		}
-		if ($this->axePower > 0) {
-			if ($toolPower != '')
-				$toolPower .= ', ';
-			$toolPower .= $this->axePower.'% axe power';
-		}
-		if ($this->hammerPower > 0) {
-			if ($toolPower != '')
-				$toolPower .= ', ';
-			$toolPower .= $this->hammerPower.'% hammer power';
-		}
-		if ($this->fishingPower > 0) {
-			if ($toolPower != '')
-				$toolPower .= ', ';
-			$toolPower .= $this->fishingPower.'% fishing power';
-		}
-		if ($this->baitPower > 0) {
-			if ($toolPower != '')
-				$toolPower .= ', ';
-			$toolPower .= $this->baitPower.'% bait power';
-		}
+		$toolPower = implode(', ', $toolPowers);
 		if ($toolPower != '') {
 			$txt .= "\n".$toolPower;
 
@@ -239,27 +201,13 @@ class Item extends ModelObject {
 				$txt .= ', '.($this->range > 0 ? '+' : '-').abs($this->range).' tile range';
 		}
 
-		$equipTxt = '';
-		if ($this->armorHead) {
-			if ($equipTxt != '')
-				$equipTxt .= ', ';
-			$equipTxt .= 'head armor';
+		$equips = [];
+		foreach (['armorHead', 'armorBody', 'armorLegs', 'accessory'] as $type) {
+			if (property_exists($this, $type) && $this->{$type}) {
+				$equips[] = strtolower(preg_replace('#(armor)(\w+)#', '$2 $1', $type));
+			}
 		}
-		if ($this->armorBody) {
-			if ($equipTxt != '')
-				$equipTxt .= ', ';
-			$equipTxt .= 'body armor';
-		}
-		if ($this->armorLegs) {
-			if ($equipTxt != '')
-				$equipTxt .= ', ';
-			$equipTxt .= 'legs armor';
-		}
-		if ($this->accessory) {
-			if ($equipTxt != '')
-				$equipTxt .= ', ';
-			$equipTxt .= 'accessory';
-		}
+		$equipTxt = implode(', ', $equips);
 
 		if ($this->vanity || $equipTxt != '') {
 			$txt .= "\n";
